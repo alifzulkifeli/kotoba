@@ -1,0 +1,13 @@
+diff --git a/node_modules/kuroshiro-analyzer-kuromoji/src/index.js b/node_modules/kuroshiro-analyzer-kuromoji/src/index.js
+index 3854289..0d93084 100644
+--- a/node_modules/kuroshiro-analyzer-kuromoji/src/index.js
++++ b/node_modules/kuroshiro-analyzer-kuromoji/src/index.js
+@@ -21,7 +21,7 @@ class Analyzer {
+ 
+         if (!dictPath) {
+             if (isNode) this._dictPath = require.resolve("kuromoji").replace(/src(?!.*src).*/, "dict/");
+-            else this._dictPath = "node_modules/kuromoji/dict/";
++            else this._dictPath = "dict/";
+         }
+         else {
+             this._dictPath = dictPath;

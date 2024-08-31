@@ -5,9 +5,14 @@ import { supabase } from '@/utils/supabase';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
+import Kuroshiro from "kuroshiro";
+import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
+
 const KanjiAdd = () => {
     // Define state to hold the input value
     const [inputValue, setInputValue] = useState<string>('');
+
+
 
 
     const [kanji, set_kanji] = useState<string>('');
@@ -37,11 +42,24 @@ const KanjiAdd = () => {
         setInputsDictDict([...inputsDict, { word: "", kana: "", meaning: "" }]);
     };
 
-    const handleChange = (event: any, index: number) => {
+    const handleChange = async (event: any, index: number) => {
         let { name, value } = event.target;
         let onChangeValue: any = [...inputsDict];
         onChangeValue[index][name] = value;
+        const kuroshiro = new Kuroshiro();
+
+        console.log(name == 'kana' && value == ".");
+        
+        if (name == 'kana' && value == ".") {
+            
+            await kuroshiro.init(new KuromojiAnalyzer());
+            const result = await kuroshiro.convert( onChangeValue[index]["word"], { to: "hiragana" });
+            onChangeValue[index]["kana"] = result;
+        }
+
         setInputsDictDict(onChangeValue);
+        
+
     };
 
     const handleDeleteInput = (index: any) => {
