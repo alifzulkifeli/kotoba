@@ -50,7 +50,7 @@ const KanjiAdd = () => {
 
         console.log(name == 'kana' && value == ".");
         
-        if (name == 'kana' && value == ".") {
+        if (name == 'kana' && value == "1") {
             
             await kuroshiro.init(new KuromojiAnalyzer());
             const result = await kuroshiro.convert( onChangeValue[index]["word"], { to: "hiragana" });
@@ -70,12 +70,23 @@ const KanjiAdd = () => {
 
 
 
-    const handleSubmit = async () => {
+    const handleSubmit = async () => { 
+
+
 
         if (!kanji) {
             toast.error("kanji cannot be empty")
             return 
         }
+
+        for (let i = 0; i < inputsDict.length; i++) {
+            const element = inputsDict[i];
+            if (element.kana.length < 1) {
+                toast.error("kana cannot be empty")
+                return
+            }
+        }
+
         let { data: k, error } = await supabase
             .from('kanji')
             .select('*').eq("kanji", kanji)
