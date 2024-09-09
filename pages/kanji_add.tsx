@@ -9,12 +9,7 @@ import Kuroshiro from "kuroshiro";
 import KuromojiAnalyzer from "kuroshiro-analyzer-kuromoji";
 
 const KanjiAdd = () => {
-    // Define state to hold the input value
-    const [inputValue, setInputValue] = useState<string>('');
-
-
-
-
+    const kuroshiro = new Kuroshiro();
     const [kanji, set_kanji] = useState<string>('');
     const [meaning, set_meaning] = useState<string>('');
     const [level, set_level] = useState<string>('');
@@ -24,6 +19,9 @@ const KanjiAdd = () => {
     const [example_sentance, set_example_sentance] = useState<string>('');
     const [example_meaning, set_example_meaning] = useState<string>('');
 
+    useEffect(() => {
+        console.log('inputsDict updated:', inputsDict);
+    }, [inputsDict]);
 
     const resetForm = () => {
         set_kanji("")
@@ -42,13 +40,31 @@ const KanjiAdd = () => {
         setInputsDictDict([...inputsDict, { word: "", kana: "", meaning: "" }]);
     };
 
+    const setVal = async (inputArray: string[], kuroshiro: Kuroshiro) => {
+        const newInputsDict = [];
+        for (let i = 0; i < (inputArray.length - 1) / 2; i++) {
+            const result = await kuroshiro.convert( inputArray[2 * i], { to: "hiragana" });
+            newInputsDict.push({ word: inputArray[2 * i], kana: result, meaning: inputArray[2 * i + 1] });
+        }
+        setInputsDictDict([...inputsDict, ...newInputsDict]);
+    };
+
+    const handleBulkInput = async () => {
+        const text = await navigator.clipboard.readText();
+        const inputArray = text.split(/\r?\n/);
+        await kuroshiro.init(new KuromojiAnalyzer());
+        setVal(inputArray, kuroshiro);
+    };
+
     const handleChange = async (event: any, index: number) => {
+        console.log(event.name, event.target,index);
+        
         let { name, value } = event.target;
         let onChangeValue: any = [...inputsDict];
         onChangeValue[index][name] = value;
-        const kuroshiro = new Kuroshiro();
+      
 
-        console.log(name == 'kana' && value == ".");
+
         
         if (name == 'kana' && value == "1") {
             
@@ -228,6 +244,9 @@ const KanjiAdd = () => {
                             />
                             {inputsDict.length > 1 && (
                                 <button className='bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-2 mr-4 border border-red-700 rounded' onClick={() => handleDeleteInput(index)}>Delete</button>
+                            )}
+                               {inputsDict.length == 1 && (
+                                <button className='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-2 mr-4 border border-red-700 rounded' onClick={() => handleBulkInput()}>Bulk</button>
                             )}
                             {index === inputsDict.length - 1 && (
                                 <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 border border-blue-700 rounded' onClick={() => handleAddInput()}>Add</button>
